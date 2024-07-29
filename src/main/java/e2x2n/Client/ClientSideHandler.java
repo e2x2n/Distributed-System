@@ -14,7 +14,7 @@ public class ClientSideHandler implements Runnable {
         String message;
         try {
             while ((message = in.readLine()) != null) {
-                System.out.println("Receive from the server: " + message);
+                System.out.println(message);
             }
         } catch (IOException e) {
             e.printStackTrace();
