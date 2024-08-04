@@ -39,13 +39,57 @@ public class ServerClientHandler extends Thread {
             }
             String message;
             while ((message = in.readLine()) != null) {
-                if (message.startsWith("/msg ")) {
-                    String[] parts = message.split(" ", 3);
-                    String recipient = parts[1];
-                    String privateMessage = username + ": " + parts[2];
-                    sendPrivateMessage(recipient, privateMessage);
-                } else {
-                    ChatServer.broadcastMessage(username + ": " + message);
+                String[] parts = message.split(" ", 3);
+                String command = parts[0];
+                switch (command) {
+                    case "/msg":
+                        if (parts.length == 3){
+                            sendPrivateMessage(parts[1], "[private] " + username + ": " + parts[2]);
+                        } else {
+                            sendMessage("Invalid private message format. Usage: /msg <recipient> <message>");
+                        }
+                        break;
+                    case "/create":
+                        if (parts.length == 2) {
+                            String groupName = parts[1];
+                            ChatServer.createGroup(groupName);
+                            ChatServer.joinGroup(groupName, this);
+                            sendMessage("Group " + groupName + " created. You have joined the group.");
+                        } else {
+                            sendMessage("Invalid group creation format. Usage: /create <group_name>");
+                        }
+                        break;
+                    case "/join":
+                        if (parts.length == 2) {
+                            String groupName = parts[1];
+                            ChatServer.joinGroup(groupName, this);
+                            sendMessage("You have joined group " + groupName);
+                        } else {
+                            sendMessage("Invalid group join format. Usage: /join <group_name>");
+                        }
+                        break;
+                    case "/leave":
+                        if (parts.length == 2) {
+                            String groupName = parts[1];
+                            ChatServer.leaveGroup(groupName, this);
+                            sendMessage("You have left group " + groupName);
+                        } else {
+                            sendMessage("Invalid group leave format. Usage: /leave <group_name>");
+                        }
+                        break;
+                    case "/group":
+                        if (parts.length == 3) {
+                            String groupName = parts[1];
+                            String groupMessage = parts[2];
+                            ChatServer.broadcastGroupMessage(groupName, "[" + groupName + "] " +
+                                    username + ": " + groupMessage, this);
+                        } else {
+                            sendMessage("Invalid group message format. Usage: /group <group_name> <message>");
+                        }
+                        break;
+                    default:
+                        ChatServer.broadcastMessage(username + ": " + message);
+                        break;
                 }
             }
         } catch (IOException e) {
@@ -76,5 +120,9 @@ public class ServerClientHandler extends Thread {
 
     public void sendMessage(String message) {
         out.println(message);
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.*;
 
 public class ChatClient {
-
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
