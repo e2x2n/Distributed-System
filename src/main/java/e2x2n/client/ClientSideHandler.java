@@ -1,4 +1,4 @@
-package e2x2n.Client;
+package e2x2n.client;
 
 import java.io.*;
 
